@@ -21,7 +21,7 @@ int calculateFCFS(int requests[], int n, int head) {
 }
 
 int calculateSCAN(int requests[], int n, int head, char direction) {
-    int seek = 0;
+    int total_seek = 0;
     int left[MAX], right[MAX], l = 0, r = 0;
     
     for (int i = 0; i < n; i++) {
@@ -34,34 +34,17 @@ int calculateSCAN(int requests[], int n, int head, char direction) {
     sort(left, l);
     sort(right, r);
 
-    if (direction == 'l') {
-        for (int i = l - 1; i >= 0; i--) {
-            seek += abs(head - left[i]);
-            head = left[i];
-        }
-        seek += head;  // move to 0
-        head = 0;
-        for (int i = 0; i < r; i++) {
-            seek += abs(right[i] - head);
-            head = right[i];
-        }
-    } else {
-        for (int i = 0; i < r; i++) {
-            seek += abs(right[i] - head);
-            head = right[i];
-        }
-        seek += (DISK_SIZE - 1 - head); // move to end
-        head = DISK_SIZE - 1;
-        for (int i = l - 1; i >= 0; i--) {
-            seek += abs(head - left[i]);
-            head = left[i];
-        }
-    }
-    return seek;
+    total_seek+=calculateFCFS(right, r, head);
+    
+    total_seek += (DISK_SIZE - 1 - right[r - 1]); // move to end
+    head = DISK_SIZE - 1;
+
+    total_seek += calculateFCFS(left, l, head);
+    return total_seek;
 }
 
 int calculateCSCAN(int requests[], int n, int head) {
-    int seek = 0;
+    int total_seek = 0;
     int left[MAX], right[MAX], l = 0, r = 0;
 
     for (int i = 0; i < n; i++) {
@@ -74,21 +57,15 @@ int calculateCSCAN(int requests[], int n, int head) {
     sort(left, l);
     sort(right, r);
 
-    for (int i = 0; i < r; i++) {
-        seek += abs(head - right[i]);
-        head = right[i];
-    }
+    total_seek += calculateFCFS(right, r, head);
 
-    seek += (DISK_SIZE - 1 - head);  // move to end
-    seek += (DISK_SIZE - 1);         // jump from end to start
+    total_seek += (DISK_SIZE - 1 - right[r - 1]);  // move to end
+    total_seek += (DISK_SIZE - 1);         // jump from end to start
     head = 0;
 
-    for (int i = 0; i < l; i++) {
-        seek += abs(head - left[i]);
-        head = left[i];
-    }
+    total_seek += calculateFCFS(left, l, head);
 
-    return seek;
+    return total_seek;
 }
 
 int main() {
