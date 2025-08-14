@@ -1,0 +1,10 @@
+COPY    START   1000
+FIRST   LDA     ALPHA
+**      ADD     BETA
+ALPHA   WORD    5
+BETA    RESW    2
+**      BYTE    C'EOF'
+**      STA     ALPHA
+LOOP    SUB     ONE
+ONE     WORD    1
+**      END     FIRST
